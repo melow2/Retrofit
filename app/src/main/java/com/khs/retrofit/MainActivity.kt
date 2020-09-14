@@ -2,7 +2,6 @@ package com.khs.retrofit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -30,13 +29,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Timber.plant(Timber.DebugTree())
         val retService = RetrofitInstance.getInstance().create(AlbumService::class.java)
         // getObserver1(retService)
-        getObserver2(retService)
+        // getObserver2(retService)
+        uploadAlbum(retService)
+    }
+
+    private fun uploadAlbum(retService: AlbumService) {
+        val album = AlbumsItem(101,"Test Title",3)
+        val postResponse:LiveData<Response<AlbumsItem>> = liveData {
+            val response = retService.uploadAlbum(album)
+            emit(response)
+        }
+        postResponse.observe(this, Observer {
+            val receivedAlbumsItem = it.body()
+            tv_album.append(receivedAlbumsItem.toString()+"\n\n")
+        })
     }
 
     private fun getObserver2(retService: AlbumService) {
